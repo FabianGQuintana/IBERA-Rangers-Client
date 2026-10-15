@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { Screen } from "@/components/ui/Screen";
 import { DashboardView } from "@/components/views/DashboardView";
 import { LoginView } from "@/components/views/LoginView";
 import { NewReportView } from "@/components/views/NewReportView";
+import { SyncView } from "@/components/views/SyncView";
 import { useHydrated } from "@/hooks/useHydrated";
 import { usePendingReports } from "@/hooks/usePendingReports";
 import { useSession } from "@/hooks/useSession";
@@ -33,13 +33,7 @@ export function RangerApp() {
 
   if (view === "new-report") return <NewReportView onDone={() => go("home")} />;
 
-  if (view === "sync") {
-    return (
-      <Screen title="Sincronizar" onBack={() => go("home")}>
-        <p className="text-xl">Próximo paso: enviar los reportes guardados.</p>
-      </Screen>
-    );
-  }
+  if (view === "sync") return <SyncView onDone={() => go("home")} />;
 
   return (
     <DashboardView
