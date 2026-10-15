@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Iberá · Guardaparques (IBERA-Rangers-Client)
 
-## Getting Started
+App web instalable (PWA) para que los guardaparques del Gran Parque Iberá reporten incidentes ambientales **sin señal** y los envíen cuando recuperan conexión.
 
-First, run the development server:
+Stack: Next.js 16 · React 19 · Tailwind CSS 4 · TypeScript (el mismo que IberAPP, la web de turistas).
+Backend: [IBERA-Rangers-API](https://github.com/FabianGQuintana/IBERA-Rangers-API) (.NET 10).
+
+## Pantallas
+
+| Pantalla | Qué hace |
+| --- | --- |
+| Login | Única pantalla con teclado. Se entra una vez con señal; la sesión queda en el teléfono (12 h). |
+| Inicio | "Hola, [Nombre]" y dos botones gigantes: **Nuevo reporte** y **Sincronizar (N pendientes)**. |
+| Nuevo reporte | Botón **Tomar foto** (cámara nativa), 4 categorías con íconos, notas opcionales y **Guardar reporte**. El GPS se toma solo al abrir la pantalla. |
+| Sincronizar | Lista de reportes guardados y **Enviar todo al servidor** (bulk insert + fotos). |
+
+## Cómo funciona sin señal
+
+- **La app**: `public/sw.js` guarda la página y el JS la primera vez que se abre con señal (solo en `npm run build && npm start`, no en `dev`).
+- **Los reportes**: se guardan en IndexedDB (`lib/storage/reports-db.ts`), con la foto comprimida en el teléfono (~1600 px JPEG).
+- **El envío**: `services/reports.ts` manda los datos en un solo `POST /api/reports/sync` (idempotente por `clientId`, si se corta la señal no se duplica nada) y después cada foto a `POST /api/reports/{id}/photo`. Un reporte se borra del teléfono recién cuando llegó su foto.
+- **Categorías**: usan los ids fijos que siembra el backend, así no hace falta descargarlas antes de salir.
+
+## Correr en desarrollo
 
 ```bash
+npm install
+cp .env.example .env.local   # ajustá API_URL si el backend no está en http://localhost:5196
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El navegador siempre llama a `/api/...` en este mismo dominio y Next lo reenvía al backend (`next.config.ts` → `rewrites`), así que no hay que configurar CORS.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> ⚠️ `API_URL` se lee **al compilar** (`npm run build`): si cambia la URL del backend, hay que volver a compilar.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Probar en un celular
 
-## Learn More
+La cámara funciona por HTTP, pero **el GPS y algunas APIs solo funcionan en HTTPS** (o `localhost`). Para probar desde el celular en la misma red usá `npx next dev --experimental-https` o publicá la app en un hosting con HTTPS.
 
-To learn more about Next.js, take a look at the following resources:
+## Reglas de diseño (perfil: 45–65 años, al sol, una mano, sin señal)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Texto base de 20 px, alto contraste (verde oscuro para acciones, azul para sincronizar, rojo solo para alertas o borrar).
+- Botones de ancho completo y mínimo 80 px de alto; nada de menús ni gestos ocultos.
+- Cero escritura obligatoria en el terreno (las notas son opcionales).
+- Confirmación gigante (✓ verde + vibración) después de guardar o enviar.
