@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
+/* Módulo Ranger — design tokens.
+   Pensado para usar al sol, con una mano y con poca experiencia digital:
+   fondo claro, texto casi negro, colores sólidos y contraste AAA en las acciones principales.
+   Una sola paleta (sin modo oscuro): al aire libre el fondo claro se lee mejor. */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f3f5f4;          /* fondo general: gris muy claro */
+  --surface: #ffffff;     /* tarjetas y campos */
+  --fg: #0d1210;          /* texto principal (contraste ~18:1 sobre --bg) */
+  --mute: #3f4a45;        /* texto secundario (contraste ~9:1, sigue siendo legible al sol) */
+  --line: #9aa7a1;        /* bordes visibles */
+  --primary: #14532d;     /* verde oscuro "naturaleza": acciones principales (texto blanco 10:1) */
+  --primary-press: #0b3a1e;
+  --sync: #1e3a8a;        /* azul oscuro: sincronizar */
+  --sync-press: #172554;
+  --danger: #b91c1c;      /* rojo: solo alertas y borrar */
+  --danger-press: #7f1d1d;
+  --warn: #9a3412;        /* naranja oscuro: avisos (sin señal, pendientes) */
+  --ok: #15803d;          /* verde del check de "guardado" */
+  --focus: #f59e0b;       /* anillo de foco bien visible (ámbar) */
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-mute: var(--mute);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-press: var(--primary-press);
+  --color-sync: var(--sync);
+  --color-sync-press: var(--sync-press);
+  --color-danger: var(--danger);
+  --color-danger-press: var(--danger-press);
+  --color-warn: var(--warn);
+  --color-ok: var(--ok);
+  --color-focus: var(--focus);
+  --font-sans: var(--font-barlow), system-ui, sans-serif;
+  --font-display: var(--font-barlow-condensed), var(--font-barlow), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Texto base grande: 20 px en vez de 16 px (usuarios de 45 a 65 años, al sol). */
+html {
+  font-size: 125%;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.4;
+  /* Evita que el "tirar para recargar" de Android recargue la app por accidente */
+  overscroll-behavior-y: contain;
+}
+
+/* Foco muy visible para quien navega con teclado o lector de pantalla */
+:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Sin animaciones si el sistema lo pide */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Margen para la barra de gestos / notch del celular */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
