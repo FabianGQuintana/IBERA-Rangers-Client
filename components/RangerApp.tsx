@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Screen } from "@/components/ui/Screen";
 import { DashboardView } from "@/components/views/DashboardView";
 import { LoginView } from "@/components/views/LoginView";
+import { NewReportView } from "@/components/views/NewReportView";
 import { useHydrated } from "@/hooks/useHydrated";
 import { usePendingReports } from "@/hooks/usePendingReports";
 import { useSession } from "@/hooks/useSession";
@@ -30,13 +31,7 @@ export function RangerApp() {
 
   if (!session) return <LoginView />;
 
-  if (view === "new-report") {
-    return (
-      <Screen title="Nuevo reporte" onBack={() => go("home")}>
-        <p className="text-xl">Próximo paso: foto, ubicación y categoría.</p>
-      </Screen>
-    );
-  }
+  if (view === "new-report") return <NewReportView onDone={() => go("home")} />;
 
   if (view === "sync") {
     return (
