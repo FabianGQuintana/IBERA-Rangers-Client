@@ -56,6 +56,8 @@ export async function apiFetch<T>(path: string, { json, auth = true, headers, ..
 
   if (!res.ok) {
     const data = (await res.json().catch(() => null)) as { code?: string; message?: string } | null;
+    // A 5xx without our JSON error body comes from the Next proxy (backend unreachable), not from the API
+    if (res.status >= 500 && !data?.code) throw new OfflineError();
     if (res.status === 401 && auth) onUnauthorized();
     throw new ApiError(res.status, data?.code ?? "ERROR", data?.message ?? defaultMessage(res.status));
   }
