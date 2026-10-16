@@ -1,12 +1,12 @@
 // Módulo Ranger service worker: the app opens in the field without signal once it was opened with signal.
 // Hand-written (no dependencies), same approach as IberAPP. Bump VERSION to drop every old cache on the next visit.
 // Reports are NOT handled here: they live in IndexedDB and are sent by the sync screen.
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `ranger-pages-${VERSION}`;
 const STATIC = `ranger-static-${VERSION}`;
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(PAGES).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icon.svg"])));
+  event.waitUntil(caches.open(PAGES).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icons/icon-192.png"])));
   self.skipWaiting();
 });
 
@@ -64,6 +64,6 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") return event.respondWith(page(request));
   if (url.pathname.startsWith("/_next/static/")) return event.respondWith(cacheFirst(request));
-  if (url.pathname === "/manifest.webmanifest" || url.pathname === "/icon.svg" || url.pathname === "/favicon.ico")
+  if (url.pathname === "/manifest.webmanifest" || url.pathname.startsWith("/icons/") || url.pathname === "/favicon.ico" || url.pathname === "/apple-icon.png")
     return event.respondWith(staleWhileRevalidate(request));
 });
